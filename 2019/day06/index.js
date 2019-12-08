@@ -40,3 +40,59 @@ const findTotalOrbits = (orbitData) => {
 
 const totalOrbits = findTotalOrbits(orbitData);
 console.log("Result (Part 1):", totalOrbits);
+
+// Part Two
+
+const setupDualGraph = (orbitData) => {
+    let reverseGraph = {};
+
+    let graph = orbitData.reduce((prev, curr) => {
+        let [from, to] = curr.split(")");
+
+        if (!prev.hasOwnProperty(from)) {
+            prev[from] = {
+                children: []
+            };
+        }
+
+        prev[from].children.push(to);
+        reverseGraph[to] = from;
+
+        return prev;
+    }, {});
+
+    return [
+        graph,
+        reverseGraph
+    ];
+}
+
+const findPath = (graph, target) => {
+    let node = target;
+    let path = [];
+
+    do {
+        path.push(node);
+        node = graph[node];
+    } while (!!node);
+
+    return path;
+}
+
+const findOrbitTransfers = (orbitData, start, end) => {
+    const [_, reverseGraph] = setupDualGraph(orbitData);
+    const pathStart = findPath(reverseGraph, start).reverse();
+    const pathEnd = findPath(reverseGraph, end).reverse();
+    let lastSharedIndex = 0;
+
+    while (pathStart[lastSharedIndex + 1] === pathEnd[lastSharedIndex + 1] && lastSharedIndex < pathStart.length - 1) {
+        lastSharedIndex++;
+    }
+
+    const startSteps = pathStart.length - lastSharedIndex - 2;
+    const endSteps = pathEnd.length - lastSharedIndex - 2;
+    return startSteps + endSteps;
+}
+
+const orbitTransfers = findOrbitTransfers(orbitData, "YOU", "SAN");
+console.log("Result (Part 2):", orbitTransfers);
