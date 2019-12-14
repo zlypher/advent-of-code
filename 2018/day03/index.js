@@ -17,15 +17,20 @@ const parseClaims = (rawClaims) => {
     });
 }
 
-const markFabric = (fabric, claim) => {
+const markFabric = (fabric, claim, overlapMap) => {
     let hasOverlap = false;
+    overlapMap[claim.id] = false;
     for (let i = claim.x; i < claim.x + claim.w; ++i) {
         for (let j = claim.y; j < claim.y + claim.h; ++j) {
-            if (fabric[i][j] > 0) {
+            const currentMark = fabric[i][j];
+            if (currentMark > 0) {
                 hasOverlap = true;
+
+                overlapMap[claim.id] = true;
+                overlapMap[currentMark] = true;
             }
 
-            fabric[i][j] += 1;
+            fabric[i][j] = claim.id;
         }
     }
     return hasOverlap;
@@ -38,12 +43,13 @@ const findClaims = (rawClaims) => {
         fabric[i] = new Array(fabricSize).fill(0);
     }
 
-    let overlapCount = 0;
     const claims = parseClaims(rawClaims);
+    const overlapMap = {};
     for (let i = 0; i < claims.length; ++i) {
-        !markFabric(fabric, claims[i]);
+        !markFabric(fabric, claims[i], overlapMap);
     }
 
+    let overlapCount = 0;
     for (let i = 0; i < fabricSize; ++i) {
         for (let j = 0; j < fabricSize; ++j) {
             if (fabric[i][j] > 1) {
@@ -52,8 +58,11 @@ const findClaims = (rawClaims) => {
         }
     }
 
-    return overlapCount;
+    return [overlapCount, Object.entries(overlapMap).filter((val) => val[1] === false)[0][0]];
 };
 
-const multipleClaimed = findClaims(rawClaims);
+const [multipleClaimed, claimId] = findClaims(rawClaims);
 console.log("Result (Part 1):", multipleClaimed);
+
+// Part 2
+console.log("Result (Part 2):", claimId);
