@@ -4,10 +4,17 @@ const fs = require("fs");
 let inputSignal = fs.readFileSync("./input.txt").toString().split("").map(x => parseInt(x, 10));
 let basePattern = [0, 1, 0, -1];
 
+const patternCache = {}
+
 const createPattern = (pattern, count) => {
+    if (patternCache[count]) {
+        return patternCache[count]
+    }
+
     const newPattern = pattern.flatMap(elem => new Array(count + 1).fill(elem));
     newPattern.shift();
     newPattern.push(0);
+    patternCache[count] = newPattern;
     return newPattern;
 }
 
