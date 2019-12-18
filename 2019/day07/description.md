@@ -38,6 +38,8 @@ Max thruster signal 65210 (from phase setting sequence 1,0,4,3,2):
 1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0
 Try every combination of phase settings on the amplifiers. What is the highest signal that can be sent to the thrusters?
 
+Your puzzle answer was -.
+
 --- Part Two ---
 It's no good - in this configuration, the amplifiers can't generate a large enough output signal to produce the thrust you'll need. The Elves quickly talk you through rewiring the amplifiers into a feedback loop:
 
@@ -71,3 +73,5 @@ Max thruster signal 18216 (from phase setting sequence 9,7,8,5,6):
 -5,54,1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4,
 53,1001,56,-1,56,1005,56,6,99,0,0,0,0,10
 Try every combination of the new phase settings on the amplifier feedback loop. What is the highest signal that can be sent to the thrusters?
+
+Your puzzle answer was -.

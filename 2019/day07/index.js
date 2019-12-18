@@ -1,5 +1,5 @@
 // Day 7: Amplification Circuit
-const { runProgram } = require("../_shared/int-code-computer");
+const { createProgram, EXT_HALT } = require("../_shared/int-code-computer-v2");
 const fs = require("fs");
 
 let program = fs.readFileSync("./input.txt").toString().split(",").map(inp => parseInt(inp, 10));
@@ -58,19 +58,38 @@ const amplifierTester = (program, phaseSettings, testerFn) => {
 // Part 2
 
 const testWithPhaseSettingV2 = (program, phaseSetting) => {
-    let output = 0;
-
+    let programs = [];
+    let inputs = [];
     for (let i = 0; i < phaseSetting.length; ++i) {
-        const setting = phaseSetting[i];
-        output = runProgram([...program], [setting, output]);
+        programs.push(createProgram([...program]));
+        inputs.push([
+            phaseSetting[i]
+        ]);
     }
+
+    let output = 0;
+    let pIdx = 0;
+    let running = true;
+    do {
+        const prog = programs[pIdx];
+        const input = [
+            ...inputs[pIdx],
+            output
+        ];
+
+        inputs[pIdx] = [];
+        const newOutput = prog.run(input);
+        if (newOutput === EXT_HALT) {
+            running = false;
+        } else {
+            output = newOutput;
+        }
+
+        pIdx = (pIdx + 1) % programs.length;
+    } while (running);
 
     return output;
 }
 
-
-program = [3, 26, 1001, 26, -4, 26, 3, 27, 1002, 27, 2, 27, 1, 27, 26, 27, 4, 27, 1001, 28, -1, 28, 1005, 28, 6, 99, 0, 0, 5];
-
-// TODO
-// const resultV2 = amplifierTester(program, [5, 6, 7, 8, 9], testWithPhaseSettingV2);
-// console.log("Result (Part 2):", resultV2);
+const resultV2 = amplifierTester(program, [5, 6, 7, 8, 9], testWithPhaseSettingV2);
+console.log("Result (Part 2):", resultV2);
