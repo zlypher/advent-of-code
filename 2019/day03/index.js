@@ -81,3 +81,54 @@ const findDistanceToClosestIntersection = (first, second) => {
 
 const result = findDistanceToClosestIntersection(firstPath, secondPath);
 console.log("Result (Part 1):", result);
+
+// Part 2
+
+const stepsUntil = (vectors, index) => {
+    if (index === 0) {
+        return 0;
+    }
+
+    let steps = 0;
+    for (let i = 0; i < index; ++i) {
+        steps += calcSteps(vectors[i], vectors[i + 1]);
+    }
+
+    return steps;
+}
+
+const calcSteps = (v1, v2) => Math.abs(v1.x - v2.x) + Math.abs(v1.y - v2.y)
+
+const findFewestSteps = (first, second) => {
+    const firstVectors = splitIntoVectors(first);
+    const secondVectors = splitIntoVectors(second);
+
+    let fewestSteps = Infinity;
+    for (let i = 0; i < firstVectors.length - 1; ++i) {
+        let steps = stepsUntil(firstVectors, i);
+        for (let j = 0; j < secondVectors.length - 1; ++j) {
+            const intersection = intersects(
+                firstVectors[i],
+                firstVectors[i + 1],
+                secondVectors[j],
+                secondVectors[j + 1]
+            );
+
+            if (intersection && intersection.x !== 0 && intersection.y !== 0) {
+                let currentSteps = steps
+                    + stepsUntil(secondVectors, j)
+                    + calcSteps(firstVectors[i], intersection)
+                    + calcSteps(secondVectors[j], intersection);
+                if (currentSteps < fewestSteps) {
+                    fewestSteps = currentSteps;
+                }
+            }
+        }
+    }
+
+    return fewestSteps;
+
+}
+
+const resultV2 = findFewestSteps(firstPath, secondPath);
+console.log("Result (Part 2):", resultV2);
