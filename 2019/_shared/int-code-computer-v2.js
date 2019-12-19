@@ -6,15 +6,17 @@ const OP_JIT = 5;
 const OP_JIF = 6;
 const OP_LET = 7;
 const OP_EQU = 8;
-const OP_EXT = 99;
+const OP_ARB = 9; // Adjust Relative Base
+const OP_EXT = 99; // Exit
 
 const PM_POS = 0; // Parameter Mode: Position
 const PM_IMM = 1; // Parameter Mode: Immediate
+const PM_REL = 2; // Parameter Mode: Relative
 const PM_DEF = PM_POS; // Parameter Mode (Default)
 
-const EXT_HALT = 0;
-const EXT_WAIT_IN = -1;
-const EXT_ERR = -99;
+const EXT_HALT = 0; // Exit: Halt
+const EXT_WAIT_IN = -1; // Exit: Waiting for Input
+const EXT_ERR = -99; // Exit: Error
 
 const readCode = (code) => {
     let operation = code % 100;
@@ -38,13 +40,16 @@ const createProgram = (program) => {
     let running = true;
     let ptr = 0;
     let input = [];
+    let relativeBase = 0;
 
     const readValue = (pos, mode = PM_DEF) => {
-        let param = program[pos];
+        let param = program[pos] || 0;
         if (mode === PM_IMM) {
             return param;
         } else if (mode === PM_POS) {
-            return program[param];
+            return program[param] || 0;
+        } else if (mode === PM_REL) {
+            return program[relativeBase + param] || 0;
         } else {
             console.log("Invalid Position Mode");
             return -1;
@@ -59,7 +64,10 @@ const createProgram = (program) => {
             ];
 
             do {
-                const { operation, paramModes } = readCode(program[ptr]);
+                const {
+                    operation,
+                    paramModes
+                } = readCode(program[ptr]);
 
                 if (operation === OP_ADD) {
                     const arg0 = readValue(ptr + 1, paramModes[0]);
@@ -120,6 +128,10 @@ const createProgram = (program) => {
 
                     program[resPtr] = arg0 === arg1 ? 1 : 0;
                     ptr += 4;
+                } else if (operation === OP_ARB) {
+                    const arg0 = readValue(ptr + 1, paramModes[0]);
+                    relativeBase += arg0;
+                    ptr += 2;
                 } else if (operation === OP_EXT) {
                     running = false;
                     return EXT_HALT;
