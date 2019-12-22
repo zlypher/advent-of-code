@@ -56,6 +56,18 @@ const createProgram = (program) => {
         }
     }
 
+    const writeValue = (pos, val, mode = PM_DEF) => {
+        const resPtr = program[pos];
+        if (mode === PM_POS) {
+            program[resPtr] = val;
+        } else if (mode === PM_REL) {
+            const offset = resPtr + relativeBase;
+            program[offset] = val;
+        } else {
+            console.log("Invalid Position Mode for write");
+        }
+    }
+
     return {
         run: (newInput) => {
             input = [
@@ -72,16 +84,18 @@ const createProgram = (program) => {
                 if (operation === OP_ADD) {
                     const arg0 = readValue(ptr + 1, paramModes[0]);
                     const arg1 = readValue(ptr + 2, paramModes[1]);
-                    const resPtr = readValue(ptr + 3, PM_IMM);
+                    writeValue(ptr + 3, arg0 + arg1, paramModes[2]);
+                    // const resPtr = readValue(ptr + 3, PM_IMM);
 
-                    program[resPtr] = arg0 + arg1;
+                    // program[resPtr] = arg0 + arg1;
                     ptr += 4;
                 } else if (operation === OP_MUL) {
                     const arg0 = readValue(ptr + 1, paramModes[0]);
                     const arg1 = readValue(ptr + 2, paramModes[1]);
-                    const resPtr = readValue(ptr + 3, PM_IMM);
+                    writeValue(ptr + 3, arg0 * arg1, paramModes[2]);
+                    // const resPtr = readValue(ptr + 3, PM_IMM);
 
-                    program[resPtr] = arg0 * arg1;
+                    // program[resPtr] = arg0 * arg1;
                     ptr += 4;
                 } else if (operation === OP_INP) {
                     if (input.length === 0) {
@@ -89,9 +103,10 @@ const createProgram = (program) => {
                     }
 
                     const argInput = input.shift();
-                    const resPtr = program[ptr + 1];
+                    writeValue(ptr + 1, argInput, paramModes[0]);
+                    // const resPtr = program[ptr + 1];
 
-                    program[resPtr] = argInput;
+                    // program[resPtr] = argInput;
                     ptr += 2;
                 } else if (operation === OP_OUT) {
                     const res = readValue(ptr + 1, paramModes[0]);
@@ -117,16 +132,18 @@ const createProgram = (program) => {
                 } else if (operation === OP_LET) {
                     const arg0 = readValue(ptr + 1, paramModes[0]);
                     const arg1 = readValue(ptr + 2, paramModes[1]);
-                    const resPtr = readValue(ptr + 3, PM_IMM);
+                    writeValue(ptr + 3, arg0 < arg1 ? 1 : 0, paramModes[2]);
+                    // const resPtr = readValue(ptr + 3, PM_IMM);
 
-                    program[resPtr] = arg0 < arg1 ? 1 : 0;
+                    // program[resPtr] = arg0 < arg1 ? 1 : 0;
                     ptr += 4;
                 } else if (operation === OP_EQU) {
                     const arg0 = readValue(ptr + 1, paramModes[0]);
                     const arg1 = readValue(ptr + 2, paramModes[1]);
-                    const resPtr = readValue(ptr + 3, PM_IMM);
+                    writeValue(ptr + 3, arg0 === arg1 ? 1 : 0, paramModes[2]);
+                    // const resPtr = readValue(ptr + 3, PM_IMM);
 
-                    program[resPtr] = arg0 === arg1 ? 1 : 0;
+                    // program[resPtr] = arg0 === arg1 ? 1 : 0;
                     ptr += 4;
                 } else if (operation === OP_ARB) {
                     const arg0 = readValue(ptr + 1, paramModes[0]);
