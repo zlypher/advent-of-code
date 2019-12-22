@@ -30,9 +30,9 @@ let reactionList = parseReactonListRaw(reactionListRaw);
 const findFormula = (reactionList, ingredient) => reactionList.filter(f => f.output.name === ingredient)[0];
 
 // Heavily inspired by https://dev.to/maxart2501/comment/ipmn
-const findRequiredOre = (reactionList) => {
+const findRequiredOre = (reactionList, amount) => {
     let required = {
-        FUEL: 1,
+        FUEL: amount,
     };
     let ingredients = {};
 
@@ -61,5 +61,23 @@ const findRequiredOre = (reactionList) => {
     return required["ORE"];
 }
 
-const result = findRequiredOre(reactionList);
+const result = findRequiredOre(reactionList, 1);
 console.log("Result (Part 1):", result);
+
+// Part 2
+let orePerFuel = result;
+
+const findFuelForOre = (reactionList, orePerFuel, oreAmount) => {
+    let estimatedFuel = Math.floor(oreAmount / orePerFuel);
+    let estimated = 0;
+    do {
+        estimated = estimatedFuel;
+        const neededOre = findRequiredOre(reactionList, estimated);
+        estimatedFuel = Math.floor(estimatedFuel * oreAmount / neededOre);
+    } while (estimatedFuel > estimated)
+
+    return estimated;
+}
+
+const resultV2 = findFuelForOre(reactionList, orePerFuel, 1e12);
+console.log("Result (Part 2):", resultV2);
