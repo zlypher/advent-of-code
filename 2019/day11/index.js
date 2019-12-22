@@ -24,13 +24,13 @@ const moveRobot = (pos, dir) => {
     return { x: pos.x + dir.x, y: pos.y + dir.y };
 }
 
-const findNumberOfPanels = (programCode) => {
+const findNumberOfPanels = (programCode, startColor) => {
     const program = createProgram([...programCode]);
     let isRunning = true;
     let dir = { x: 0, y: 1 };
     let pos = { x: 0, y: 0 };
     let coloredPanels = {}
-    coloredPanels[id(pos)] = 0;
+    coloredPanels[id(pos)] = startColor;
 
     do {
         let args = coloredPanels[id(pos)] || 0;
@@ -61,8 +61,37 @@ const findNumberOfPanels = (programCode) => {
         pos = moveRobot(pos, dir);
     } while (isRunning);
 
-    return Object.keys(coloredPanels).length;
+    return coloredPanels;
 }
 
-const result = findNumberOfPanels(programCode);
-console.log("Result (Part 1):", result);
+const drawPanel = (coloredPanels) => {
+    const height = 6;
+    const width = 45;
+    const hull = new Array(height);
+    for (let i = 0; i < hull.length; ++i) {
+        hull[i] = new Array(width).fill(" ");
+    }
+
+    Object.entries(coloredPanels).forEach(([key, val]) => {
+        const [x, y] = key.split("_");
+        try {
+        hull[Math.abs(y)][Math.abs(x)] = val === 1 ? "#" : " ";
+        } catch (e) {
+            debugger;
+        }
+    });
+
+    for (let i = 0; i < hull.length; ++i) {
+        const line = hull[i].join("");
+        console.log(line);
+    }
+}
+
+const result = findNumberOfPanels(programCode, startColor = 0);
+console.log("Result (Part 1):", Object.keys(result).length);
+
+// Part 2
+
+const resultV2 = findNumberOfPanels(programCode, startColor = 1);
+console.log("Result (Part 2)");
+drawPanel(resultV2);
