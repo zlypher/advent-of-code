@@ -93,5 +93,88 @@ const makePairs = (moons) => {
     return pairs;
 }
 
-const result = trackMoons(moons, 1000);
-console.log("Result (Part 1):", result);
+// const result = trackMoons(moons, 1000);
+// console.log("Result (Part 1):", result);
+
+// Part 2
+
+const extractAxis = (moon, axis) => {
+    return {
+        pos: moon.pos[axis],
+        velocity: moon.velocity[axis]
+    };
+}
+
+const makeState = (moons) => {
+    return moons.reduce((prev, curr) => {
+        return prev + "|" + curr.pos + "_" + curr.velocity;
+    }, "");
+}
+
+const applyGravityOnSingleAxis = (fst, snd) => {
+    if (fst.pos === snd.pos) {
+        return;
+    }
+
+    if (fst.pos > snd.pos) {
+        fst.velocity -= 1;
+        snd.velocity += 1;
+    } else {
+        fst.velocity += 1;
+        snd.velocity -= 1;
+    }
+}
+
+const updateStepOnSingleAxis = (moons, pairs) => {
+    pairs.forEach(([fst, snd]) => {
+        applyGravityOnSingleAxis(fst, snd);
+    })
+
+    // apply velocity to position
+    moons.forEach(m => {
+        m.pos += m.velocity;
+    });
+}
+
+const findFirstRepeat = (fullMoons, axis) => {
+    const moonsOnAxis = fullMoons.map((m) => extractAxis(m, axis));
+    const pairs = makePairs(moonsOnAxis);
+    const stateToFind = makeState(moonsOnAxis);
+
+    let counter = 0;
+    do {
+        updateStepOnSingleAxis(moonsOnAxis, pairs);
+        counter++;
+    } while (stateToFind !== makeState(moonsOnAxis));
+
+    return counter;
+}
+
+// https://stackoverflow.com/a/31302607/733368
+function leastCommonMultiple(...input) {
+    function gcd(a, b) {
+        return !b ? a : gcd(b, a % b);
+    }
+
+    function lcm(a, b) {
+        return (a * b) / gcd(a, b);
+    }
+
+    var multiple = 1;
+    input.forEach(function(n) {
+        multiple = lcm(multiple, n);
+    });
+
+    return multiple;
+}
+
+const findStepsUntilRepeat = (moons) => {
+    const repeatX = findFirstRepeat(moons, "x");
+    const repeatY = findFirstRepeat(moons, "y");
+    const repeatZ = findFirstRepeat(moons, "z");
+
+    return leastCommonMultiple(repeatX, repeatY, repeatZ);
+}
+
+const result = findStepsUntilRepeat(moons);
+console.log("Result (Part 2):", result);
