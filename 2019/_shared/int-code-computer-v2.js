@@ -14,7 +14,7 @@ const PM_IMM = 1; // Parameter Mode: Immediate
 const PM_REL = 2; // Parameter Mode: Relative
 const PM_DEF = PM_POS; // Parameter Mode (Default)
 
-const EXT_HALT = 0; // Exit: Halt
+const EXT_HALT = -100; // Exit: Halt
 const EXT_WAIT_IN = -1; // Exit: Waiting for Input
 const EXT_ERR = -99; // Exit: Error
 
@@ -69,7 +69,7 @@ const createProgram = (program) => {
     }
 
     return {
-        run: (newInput) => {
+        run: (...newInput) => {
             input = [
                 ...input,
                 ...newInput
@@ -167,5 +167,6 @@ const createProgram = (program) => {
 
 module.exports = {
     createProgram,
-    EXT_HALT
+    EXT_HALT,
+    EXT_WAIT_IN
 };
