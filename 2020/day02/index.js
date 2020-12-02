@@ -17,7 +17,7 @@ const parseInputLine = (line) => {
 }
 
 
-function solvePartOne(input) {
+function solvePartOneOrTwo(input, checkPassword) {
     let numValidPasswords = 0;
     for (let i = 0; i < input.length; ++i) {
         const {
@@ -33,7 +33,7 @@ function solvePartOne(input) {
     return numValidPasswords;
 }
 
-function checkPassword(password, letter, min, max) {
+function checkPasswordPartOne(password, letter, min, max) {
     const map = {};
 
     for (let i = 0; i < password.length; ++i) {
@@ -44,5 +44,16 @@ function checkPassword(password, letter, min, max) {
     return map[letter] >= min && map[letter] <= max;
 }
 
+function checkPasswordPartTwo(password, letter, fstIndex, sndIndex) {
+    const fstChar = password[fstIndex - 1];
+    const sndChar = password[sndIndex - 1];
+
+    const fstMatch = fstChar === letter;
+    const sndMatch = sndChar === letter;
+
+    return fstMatch != sndMatch;
+}
+
 const input = prepareInput();
-console.log(solvePartOne(input));
+console.log(solvePartOneOrTwo(input, checkPasswordPartOne));
+console.log(solvePartOneOrTwo(input, checkPasswordPartTwo));
