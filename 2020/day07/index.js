@@ -26,7 +26,7 @@ function solvePartOne(parentBagDef, target) {
     return totalParents.size;
 }
 
-function parseBags(input) {
+function parseParentBags(input) {
     const parentBags = {};
 
     for (let i = 0; i < input.length; ++i) {
@@ -74,6 +74,40 @@ function parseSingleContains(line) {
     return bags;
 }
 
+function solvePartTwo(bagDef, target) {
+    return calculateTotalBags(bagDef, target);
+}
+
+function calculateTotalBags(bagDef, target) {
+    const contains = bagDef[target];
+    if (contains.length === 0) {
+        return 0;
+    }
+
+    let total = 0;
+
+    for (let i = 0; i < contains.length; ++i) {
+        const [num, type] = contains[i];
+        const calc = calculateTotalBags(bagDef, type);
+        total = total + num * (calc + 1);
+    }
+
+    return total;
+}
+
+function parseBags(input) {
+    const bags = {};
+
+    for (let i = 0; i < input.length; ++i) {
+        const [base, contains] = parseBagDefinition(input[i]);
+        bags[base] = contains;
+    }
+
+    return bags;
+}
+
 const input = prepareInput();
+const parentBags = parseParentBags(input);
+// console.log(solvePartOne(parentBags, "shiny gold"));
 const bags = parseBags(input);
-console.log(solvePartOne(bags, "shiny gold"));
+console.log(solvePartTwo(bags, "shiny gold"));
