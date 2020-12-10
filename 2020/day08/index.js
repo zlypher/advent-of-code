@@ -1,6 +1,5 @@
 // Day 8: Handheld Halting
 const fs = require("fs");
-const { start } = require("repl");
 
 const OP_NOP = "nop";
 const OP_ACC = "acc";
