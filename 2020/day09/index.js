@@ -1,4 +1,5 @@
 // Day 9: Encoding Error
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require("constants");
 const fs = require("fs");
 
 const prepareInput = () => fs.readFileSync("./input.txt")
@@ -8,8 +9,6 @@ const prepareInput = () => fs.readFileSync("./input.txt")
 
 function solvePartOne(input, preambleSize) {
     let arr = input.slice(0, preambleSize);
-
-    console.log(arr);
 
     for (let i = preambleSize; i < input.length; ++i) {
         let current = input[i];
@@ -43,5 +42,27 @@ function findSum(numbers, target) {
     return false;
 }
 
+function solvePartTwo(input, preambleSize) {
+    const target = solvePartOne(input, preambleSize);
+
+    for (let i = 0; i < input.length; ++i) {
+        let current = [];
+        for (let j = i; j < input.length; ++j) {
+            current.push(input[j]);
+            const currentSum = current.reduce((prev, curr) => { return prev + curr; }, 0);
+            if (currentSum === target) {
+                const min = Math.min(...current);
+                const max = Math.max(...current);
+                return min + max;
+            } else if (currentSum > target) {
+                break;
+            }
+        }
+    }
+
+    return -1;
+}
+
 const input = prepareInput();
 console.log(solvePartOne(input, 25));
+console.log(solvePartTwo(input, 25));
