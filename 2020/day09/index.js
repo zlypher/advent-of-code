@@ -1,5 +1,4 @@
 // Day 9: Encoding Error
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require("constants");
 const fs = require("fs");
 
 const prepareInput = () => fs.readFileSync("./input.txt")
