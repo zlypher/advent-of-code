@@ -1,12 +1,12 @@
 // Day 23: Crab Cups
-const prepareInput = () => "586439172".split("").map(n => parseInt(n, 10));
+// const prepareInput = () => "586439172".split("").map(n => parseInt(n, 10));
+const prepareInput = () => "389125467".split("").map(n => parseInt(n, 10));
 
-function solvePartOne(input) {
+function solvePartOne(input, target) {
     let cups = createCups(input);
     let cupMap = createCupMap(cups);
     let maxCup = Math.max(...input);
     let move = 1;
-    let target = 100;
 
     let current = cups;
 
@@ -15,7 +15,7 @@ function solvePartOne(input) {
         const [pickupCups, lastPickupCup] = pickCups(current)
 
         // select destination cup
-        const destination = pickDestinationCup(current, maxCup + 1);
+        const destination = pickDestinationCup(current, pickupCups, cupMap, maxCup + 1);
 
         // place cups
         lastPickupCup.next = destination.next;
@@ -26,6 +26,44 @@ function solvePartOne(input) {
     }
 
     return getResult(current);
+}
+
+function solvePartTwo(input, target) {
+    let cups = createCupsV2(input, 1_000_000);
+    let cupMap = createCupMap(cups);
+    let maxCup = Math.max(...input);
+    let move = 1;
+
+    let targetCup = findCup(cups, 1);
+
+    let current = cups;
+
+    while (move <= target) {
+        // pickup cups
+        const [pickupCups, lastPickupCup] = pickCups(current)
+
+        // select destination cup
+        const destination = pickDestinationCup(current, pickupCups, cupMap, maxCup + 1);
+
+        // place cups
+        lastPickupCup.next = destination.next;
+        destination.next = pickupCups;
+
+        move++;
+        current = current.next;
+    }
+
+
+    return targetCup.next.data * targetCup.next.next.data;
+}
+
+function findCup(root, target) {
+    let node = root;
+    while (node.data != target) {
+        node = node.next;
+    }
+
+    return node;
 }
 
 function getResult(node) {
@@ -94,6 +132,25 @@ function createCups(input) {
     return rootNode;
 }
 
+function createCupsV2(input, num) {
+    const rootNode = createLLNode(input[0]);
+    let node = rootNode;
+    let i = 1;
+    for (; i < input.length; ++i) {
+        node = appendNode(node, input[i]);
+    }
+
+    i = i + 1;
+
+    for (; i <= num; ++i) {
+        node = appendNode(node, i);
+    }
+
+    node.next = rootNode;
+
+    return rootNode;
+}
+
 function createLLNode(data) {
     return {
         data,
@@ -112,22 +169,36 @@ function appendNode(node, data) {
     return newNode
 }
 
-function pickDestinationCup(current, max) {
-    let target = current.data - 1;
-    let node = current.next;
-
-    while (true) {
+function checkPickups(pickups, target) {
+    let node = pickups;
+    while (node != null) {
         if (node.data === target) {
             return node;
         }
 
-        if (node === current) {
-            target = (target + max - 1) % max;
-        }
-
         node = node.next;
     }
+
+    return null;
+}
+
+function fixIdx(idx, max) {
+    return idx < 1 ? max : idx;
+}
+
+function pickDestinationCup(current, pickups, map, max) {
+    let target = fixIdx(current.data - 1, max - 1);
+    let targetNode = checkPickups(pickups, target);
+
+    // find next outside of pickups
+    while (targetNode != null) {
+        target = fixIdx(target - 1, max - 1);
+        targetNode = checkPickups(pickups, target);
+    }
+
+    return map[target];
 }
 
 const input = prepareInput();
-console.log(solvePartOne(input));
+console.log(solvePartOne(input, 100));
+console.log(solvePartTwo(input, 10_000_000));
