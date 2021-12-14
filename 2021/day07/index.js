@@ -26,6 +26,23 @@ function solvePartOne(input) {
 
 console.log(solvePartOne(input));
 
-function solvePartTwo(input) {}
+const costForSteps = (steps) => {
+  if (steps <= 1) {
+    return steps;
+  }
+  return costForSteps(steps - 1) + steps;
+};
+
+function solvePartTwo(input) {
+  const sorted = [...input];
+  sorted.sort((a, b) => a - b);
+
+  let values = [];
+  for (let i = Math.min(...sorted); i <= Math.max(...sorted); ++i) {
+    values.push(sorted.reduce((p, c) => p + costForSteps(Math.abs(i - c)), 0));
+  }
+
+  return Math.min(...values);
+}
 
 console.log(solvePartTwo(input));
