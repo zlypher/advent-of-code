@@ -66,6 +66,7 @@ function solvePartTwo(input) {
 
   // TODO: Too slow
   for (let step = 0; step < 40; ++step) {
+    console.log(step + 1);
     currentTemplate = expandTemplate(currentTemplate, rules);
   }
 

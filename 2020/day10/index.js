@@ -29,5 +29,32 @@ function solvePartOne(input) {
     return diffOne * diffThree;
 }
 
+function solvePartTwo(input) {
+    input.push(0); // Add outlet
+    const sorted = input.sort((a, b) => a - b);
+    sorted.push(sorted[sorted.length - 1] + 3);
+
+    const tree = createTree(sorted);
+    return countLeaves(tree);
+}
+
+function createTree(input) {
+    const tree = {
+        value: input[0],
+        children: [],
+    };
+
+    for (let i = 0; i < input.length; ++i) {
+        
+    }
+
+    return tree;
+}
+
+function countLeaves(tree) {
+    return -1;
+}
+
 const input = prepareInput();
-console.log(solvePartOne(input));
+// console.log(solvePartOne(input));
+console.log(solvePartTwo(input));

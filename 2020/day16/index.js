@@ -1,4 +1,4 @@
-// Day 15: Rambunctious Recitation
+// Day 16: Ticket Translation
 const fs = require("fs");
 
 const prepareInput = () => fs.readFileSync("./input.txt")
