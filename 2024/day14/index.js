@@ -33,8 +33,8 @@ function solvePartOne(input) {
   const { robots } = input;
 
   const seconds = 100;
-  const width = 101; // 101
-  const height = 103; // 103
+  const width = 101;
+  const height = 103;
   const quadrants = [
     [0, 0],
     [0, 0],
@@ -64,6 +64,33 @@ function solvePartOne(input) {
 
 console.log(solvePartOne(input));
 
-function solvePartTwo(input) {}
+function solvePartTwo(input) {
+  const { robots } = input;
+
+  const width = 101;
+  const height = 103;
+
+  for (let i = 0; i < width * height; ++i) {
+    let duplicate = false;
+    let map = {};
+    for (let robot of robots) {
+      const x = (((robot.pos.x + robot.v.x * i) % width) + width) % width;
+      const y = (((robot.pos.y + robot.v.y * i) % height) + height) % height;
+
+      if (map[x + "-" + y]) {
+        duplicate = true;
+        break;
+      }
+
+      map[x + "-" + y] = true;
+    }
+
+    if (!duplicate) {
+      return i;
+    }
+  }
+
+  return 0;
+}
 
 console.log(solvePartTwo(input));
