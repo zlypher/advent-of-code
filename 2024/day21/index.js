@@ -1,19 +1,17 @@
 const fs = require("fs");
 
-// const state = ["A", "A", "A"];
-
 const numericKeypadMap = {
   A: {
     A: "A",
     0: "<A",
     1: "^<<A",
-    2: "^<A",
+    2: "<^A",
     3: "^A",
     4: "^^<<A",
-    5: "^^<A",
+    5: "<^^A",
     6: "^^A",
     7: "^^^<<A",
-    8: "^^^<A",
+    8: "<^^^A",
     9: "^^^A",
   },
   0: {
@@ -43,21 +41,21 @@ const numericKeypadMap = {
     9: "^^>>A",
   },
   2: {
-    A: ">vA",
+    A: "v>A",
     0: "vA",
     1: "<A",
     2: "A",
     3: ">A",
-    4: "^<A",
+    4: "<^A",
     5: "^A",
     6: "^>A",
-    7: "^^<A",
+    7: "<^^A",
     8: "^^A",
     9: "^^>A",
   },
   3: {
     A: "vA",
-    0: "v<A",
+    0: "<vA",
     1: "<<A",
     2: "<A",
     3: "A",
@@ -72,8 +70,8 @@ const numericKeypadMap = {
     A: ">>vvA",
     0: ">vvA",
     1: "vA",
-    2: ">vA",
-    3: ">>vA",
+    2: "v>A",
+    3: "v>>A",
     4: "A",
     5: ">A",
     6: ">>A",
@@ -82,9 +80,9 @@ const numericKeypadMap = {
     9: "^>>A",
   },
   5: {
-    A: ">vvA",
+    A: "vv>A",
     0: "vvA",
-    1: "v<A",
+    1: "<vA",
     2: "vA",
     3: "v>A",
     4: "<A",
@@ -96,9 +94,9 @@ const numericKeypadMap = {
   },
   6: {
     A: "vvA",
-    0: "vv<A",
-    1: "v<<A",
-    2: "v<A",
+    0: "<vvA",
+    1: "<<vA",
+    2: "<vA",
     3: "vA",
     4: "<<A",
     5: "<A",
@@ -121,12 +119,12 @@ const numericKeypadMap = {
     9: ">>A",
   },
   8: {
-    A: ">vvvA",
+    A: "vvv>A",
     0: "vvvA",
-    1: "vv<A",
+    1: "<vvA",
     2: "vvA",
     3: "vv>A",
-    4: "v<A",
+    4: "<vA",
     5: "vA",
     6: "v>A",
     7: "<A",
@@ -135,12 +133,12 @@ const numericKeypadMap = {
   },
   9: {
     A: "vvvA",
-    0: "vvv<A",
-    1: "vv<<A",
-    2: "vv<A",
+    0: "<vvvA",
+    1: "<<vvA",
+    2: "<vvA",
     3: "vvA",
-    4: "v<<A",
-    5: "v<A",
+    4: "<<vA",
+    5: "<vA",
     6: "vA",
     7: "<<A",
     8: "<A",
@@ -152,7 +150,7 @@ const directionalKeypadMap = {
   A: {
     A: "A",
     ">": "vA",
-    v: "v<A",
+    v: "<vA",
     "<": "v<<A",
     "^": "<A",
   },
@@ -161,10 +159,10 @@ const directionalKeypadMap = {
     ">": "A",
     v: "<A",
     "<": "<<A",
-    "^": "^<A",
+    "^": "<^A",
   },
   v: {
-    A: ">^A",
+    A: "^>A",
     ">": ">A",
     v: "A",
     "<": "<A",
@@ -179,9 +177,9 @@ const directionalKeypadMap = {
   },
   "^": {
     A: ">A",
-    ">": ">vA",
+    ">": "v>A",
     v: "vA",
-    "<": "<vA",
+    "<": "v<A",
     "^": "A",
   },
 };
@@ -208,10 +206,6 @@ function solvePartOne(input) {
   for (let code of codes) {
     const result = calculateComplexity(code);
     sum += result;
-
-    // state[0] = "A";
-    // state[1] = "A";
-    // state[2] = "A";
   }
 
   return sum;
@@ -220,7 +214,16 @@ function solvePartOne(input) {
 console.log(solvePartOne(input));
 
 function solvePartTwo(input) {
-  const { numbers } = input;
+  const { codes } = input;
+
+  let sum = 0;
+
+  for (let code of codes) {
+    const result = calculateComplexityV2(code);
+    sum += result;
+  }
+
+  return sum;
 }
 
 console.log(solvePartTwo(input));
@@ -228,8 +231,7 @@ console.log(solvePartTwo(input));
 function calculateComplexity(code) {
   const seq = calculate(
     directionalKeypadMap,
-    calculate(directionalKeypadMap, calculate(numericKeypadMap, code, 0), 1),
-    2
+    calculate(directionalKeypadMap, calculate(numericKeypadMap, code))
   );
 
   const len = seq.length;
@@ -240,17 +242,32 @@ function calculateComplexity(code) {
   return len * val;
 }
 
-function calculate(map, code, stateIdx) {
+function calculateComplexityV2(code) {
+  let seq = calculate(numericKeypadMap, code);
+  let count = 25;
+  // Runs into error
+  // while (count > 0) {
+  //   seq = calculate(directionalKeypadMap, seq);
+  //   count--;
+  // }
+
+  const len = seq.length;
+  const val = parseInt(code, 10);
+
+  console.log(code, ":", len, "*", val);
+
+  return len * val;
+}
+
+function calculate(map, code) {
   let completeSequence = [];
   let current = "A";
 
   for (let char of code) {
-    const sequence = enter(map, char, current); // state[stateIdx]);
-    // state[stateIdx] = char;
+    const sequence = enter(map, char, current);
     current = char;
     completeSequence.push(sequence);
   }
-  console.log(completeSequence.join(""));
   return completeSequence.join("");
 }
 
