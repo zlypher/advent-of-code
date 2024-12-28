@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { printMap } = require("../../utils/print-map");
 
 const prepareInput = () => {
   const map = [];
@@ -107,6 +108,13 @@ function guardCanMove(guard, move, map) {
   return map[nextPosY][nextPosX] !== "#";
 }
 
+function guardCanMoveV2(guard, move, map, obstruction) {
+  const nextPosX = guard.x + move.x;
+  const nextPosY = guard.y + move.y;
+
+  return map[nextPosY][nextPosX] !== "#" && map[nextPosY][nextPosX] !== "O";
+}
+
 function rotateGuard(guard) {
   switch (guard.dir) {
     case "UP":
@@ -160,19 +168,32 @@ function solvePartTwo(input) {
   let currentStep = 0;
   const LIMIT_STEPS = 100000;
 
+  let found = [];
+  let visited = {};
+
   while (currentStep < LIMIT_STEPS) {
+    visited[keySimple(guard)] = true;
     let move = getMove(guard.dir);
     if (outOfBounds(guard, move, maxX, maxY)) {
       break;
     }
 
-    while (!guardCanMove(guard, move, map)) {
+    if (!guardCanMove(guard, move, map)) {
       guard.dir = rotateGuard(guard);
-      move = getMove(guard.dir);
+      continue;
     }
 
     // Experiment with new obstruction
-    possiblySpots += simulateObstruction(guard, move, map, maxX, maxY) ? 1 : 0;
+    const obstr = {
+      x: guard.x + move.x,
+      y: guard.y + move.y,
+    };
+    if (!visited[keySimple(obstr)]) {
+      if (simulateObstruction(guard, move, map, maxX, maxY, obstr)) {
+        possiblySpots++;
+        found.push(obstr);
+      }
+    }
 
     const nextPos = updatePosition(guard, move);
     markPosition(nextPos, map, mark(guard.dir));
@@ -183,23 +204,24 @@ function solvePartTwo(input) {
   return possiblySpots;
 }
 
-function simulateObstruction(guard, move, map, maxX, maxY) {
-  const obstruction = {
-    x: guard.x + move.x,
-    y: guard.y + move.y,
-  };
+function keySimple(obj) {
+  return obj.x + "-" + obj.y;
+}
 
-  const field = map[obstruction.y][obstruction.x];
-  if (field === "^" || field === "<" || field === ">" || field === "v") {
-    return false;
-  }
+function key(guard) {
+  return guard.x + "-" + guard.y + "-" + guard.dir;
+}
 
+function simulateObstruction(guard, move, map, maxX, maxY, obstruction) {
   let simulatedGuard = { ...guard };
-  simulatedGuard.dir = rotateGuard(simulatedGuard);
   let simulatedMove = move;
 
   let currentStep = 0;
-  const LIMIT_STEPS = 5000;
+  const LIMIT_STEPS = 10000;
+  const visited = {};
+
+  const prevField = map[obstruction.y][obstruction.x];
+  map[obstruction.y][obstruction.x] = "O";
 
   while (currentStep < LIMIT_STEPS) {
     simulatedMove = getMove(simulatedGuard.dir);
@@ -207,25 +229,25 @@ function simulateObstruction(guard, move, map, maxX, maxY) {
       break;
     }
 
-    while (!guardCanMove(simulatedGuard, simulatedMove, map)) {
+    if (!guardCanMoveV2(simulatedGuard, simulatedMove, map, obstruction)) {
       simulatedGuard.dir = rotateGuard(simulatedGuard);
-      simulatedMove = getMove(simulatedGuard.dir);
+      continue;
     }
 
     updatePosition(simulatedGuard, simulatedMove);
 
-    if (
-      map[simulatedGuard.y][simulatedGuard.x] === mark(simulatedGuard.dir) ||
-      (guard.x === obstruction.x && guard.y === obstruction.y)
-    ) {
-      console.log(obstruction);
-      return true;
+    if (visited[key(simulatedGuard)]) {
+      map[obstruction.y][obstruction.x] = prevField;
+      return obstruction;
+    } else {
+      visited[key(simulatedGuard)] = true;
     }
 
     currentStep++;
   }
 
-  return false;
+  map[obstruction.y][obstruction.x] = prevField;
+  return null;
 }
 
 console.log(solvePartTwo(input));
