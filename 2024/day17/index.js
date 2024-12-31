@@ -77,8 +77,34 @@ function solvePartOne(input) {
 // console.log(solvePartOne(input));
 
 function solvePartTwo(input) {
-  const { registers, instructions } = input;
+  const { _, instructions } = input;
 
+  let registerA = 0o0000000000000000;
+  let output = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  let idx = 15;
+
+  while (idx >= 0) {
+    registerA += 0o1 * 8 ** idx;
+    output = runProgram([registerA, 0o0, 0o0], instructions);
+    idx = compare(instructions, output);
+  }
+
+  return registerA;
+}
+
+console.log(solvePartTwo(input));
+
+function compare(instructions, output) {
+  if (instructions.length != output.length) return instructions.length - 1;
+
+  for (let i = instructions.length - 1; i >= 0; --i) {
+    if (instructions[i] != output[i]) return i;
+  }
+
+  return -1;
+}
+
+function runProgram(registers, instructions) {
   let output = [];
   let ptr = 0;
   while (ptr < instructions.length) {
@@ -98,7 +124,7 @@ function solvePartTwo(input) {
         registers[1] = registers[1] ^ operand;
         break;
       case 2:
-        registers[1] = combo(operand, registers) % 8;
+        registers[1] = mod(combo(operand, registers), 8);
         break;
       case 3:
         if (registers[0] === 0) break;
@@ -108,7 +134,7 @@ function solvePartTwo(input) {
         registers[1] = registers[1] ^ registers[2];
         break;
       case 5:
-        output.push(combo(operand, registers) % 8);
+        output.push(mod(combo(operand, registers), 8));
         break;
       case 6:
         registers[1] = parseInt(
@@ -125,10 +151,12 @@ function solvePartTwo(input) {
     }
   }
 
-  return output.join(",");
+  return output;
 }
 
-console.log(solvePartTwo(input));
+function mod(x, n) {
+  return ((x % n) + n) % n;
+}
 
 function combo(operand, registers) {
   if (operand <= 3) {
