@@ -37,10 +37,11 @@ function solvePartTwo(input) {
   const { patterns, designs } = input;
 
   let count = 0;
+  const memo = {};
 
   for (let design of designs) {
     console.log("check design", design);
-    count += checkDesignV2(design, patterns);
+    count += checkDesignV2(design, patterns, memo);
   }
 
   return count;
@@ -62,16 +63,18 @@ function checkDesign(design, patterns) {
   return match;
 }
 
-function checkDesignV2(design, patterns) {
+function checkDesignV2(design, patterns, memo) {
   if (design.length === 0) return 1;
+  if (memo[design] !== undefined) return memo[design];
 
   let count = 0;
 
   for (let pattern of patterns) {
     if (design.startsWith(pattern)) {
-      count += checkDesignV2(design.substring(pattern.length), patterns);
+      count += checkDesignV2(design.substring(pattern.length), patterns, memo);
     }
   }
 
+  memo[design] = count;
   return count;
 }
