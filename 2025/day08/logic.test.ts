@@ -27,23 +27,23 @@ describe("Day 8", () => {
 984,92,344
 425,690,689`;
       const input = prepareInput(rawInput);
-      const result = solvePartOne(input);
+      const result = solvePartOne(input, 10);
 
       expect(result).toBe(40);
     });
 
-    it.todo("should solve the actual input", () => {
+    it("should solve the actual input", () => {
       const rawInput = fs
         .readFileSync(path.resolve(import.meta.dirname, "input.txt"))
         .toString();
       const input = prepareInput(rawInput);
       const result = solvePartOne(input);
 
-      expect(result).toBe(-1);
+      expect(result).toBe(67488);
     });
   });
   describe("Part Two", () => {
-    it.todo("should solve the example input", () => {
+    it("should solve the example input", () => {
       const rawInput = `162,817,812
 57,618,57
 906,360,560
@@ -67,17 +67,17 @@ describe("Day 8", () => {
       const input = prepareInput(rawInput);
       const result = solvePartTwo(input);
 
-      expect(result).toBe(-1);
+      expect(result).toBe(25272);
     });
 
-    it.todo("should solve the actual input", () => {
+    it("should solve the actual input", () => {
       const rawInput = fs
         .readFileSync(path.resolve(import.meta.dirname, "input.txt"))
         .toString();
       const input = prepareInput(rawInput);
       const result = solvePartTwo(input);
 
-      expect(result).toBe(-1);
+      expect(result).toBe(3767453340);
     });
   });
 });
