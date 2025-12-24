@@ -1,36 +1,35 @@
+type Problem = {
+  numbers: number[];
+  numbersRaw: string[];
+  operation: string;
+};
+
 export type Input = {
-  problems: { numbers: number[]; operation: string }[];
+  problems: Problem[];
 };
 
 export const prepareInput = (rawInput: string): Input => {
-  let problems = [];
+  let problems: Problem[] = [];
   const lines = rawInput.split("\n");
+
+  let opLine = lines[lines.length - 1];
+  let operations = opLine.matchAll(/([\+\*]+\s*)/gm);
+  const operationsArr = [...operations].map((o) => o[0]);
+  for (let j = 0; j < operationsArr.length; j++) {
+    problems.push({ numbers: [], numbersRaw: [], operation: operationsArr[j] });
+  }
 
   for (let i = 0; i < lines.length - 1; i++) {
     let line = lines[i];
-    const numbers = line.matchAll(/([0-9]+)/gm);
-    const numbersArr = [...numbers].map((n) => Number(n[0]));
-    if (i === 0) {
-      for (let j = 0; j < numbersArr.length; j++) {
-        problems.push({
-          numbers: [numbersArr[j]],
-          operation: "",
-        });
-      }
-    } else {
-      for (let j = 0; j < numbersArr.length; j++) {
-        problems[j].numbers.push(numbersArr[j]);
-      }
+    let currIdx = 0;
+    for (let j = 0; j < problems.length; j++) {
+      let currLen = problems[j].operation.length;
+      let adaptedLen = j === problems.length - 1 ? currLen : currLen - 1;
+      let numRaw = line.slice(currIdx, currIdx + adaptedLen);
+      problems[j].numbersRaw.push(numRaw);
+      problems[j].numbers.push(Number(numRaw));
+      currIdx += currLen;
     }
-  }
-
-  console.log(problems);
-
-  let line = lines[lines.length - 1];
-  let operations = line.matchAll(/([\+\*]+)/gm);
-  const operationsArr = [...operations].map((o) => o[0]);
-  for (let j = 0; j < operationsArr.length; j++) {
-    problems[j].operation = operationsArr[j];
   }
 
   return { problems };
@@ -43,10 +42,10 @@ export function solvePartOne(input: Input): number {
     let total = problem.numbers[0];
     for (let i = 1; i < problem.numbers.length; i++) {
       const num = problem.numbers[i];
-
-      if (problem.operation === "+") {
+      const op = problem.operation.trim();
+      if (op === "+") {
         total += num;
-      } else if (problem.operation === "*") {
+      } else if (op === "*") {
         total *= num;
       }
     }
@@ -58,19 +57,19 @@ export function solvePartOne(input: Input): number {
 }
 
 export function solvePartTwo(input: Input): number {
-  console.log(input);
   let grandTotal = 0;
 
   for (const problem of input.problems) {
-    const numbers = convertNumbers(problem.numbers);
+    const numbers = convertNumbers(problem.numbersRaw);
 
     let total = numbers[0];
     for (let i = 1; i < numbers.length; i++) {
       const num = numbers[i];
+      const op = problem.operation.trim();
 
-      if (problem.operation === "+") {
+      if (op === "+") {
         total += num;
-      } else if (problem.operation === "*") {
+      } else if (op === "*") {
         total *= num;
       }
     }
@@ -81,14 +80,16 @@ export function solvePartTwo(input: Input): number {
   return grandTotal;
 }
 
-function convertNumbers(numbers: number[]): number[] {
-  return numbers.map((n) => {
-    let str = n.toString();
-    let converted = "";
-    for (let char of str) {
-      let digit = Number(char);
-      converted += (9 - digit).toString();
+function convertNumbers(numbersRaw: string[]): number[] {
+  const len = numbersRaw[0].length;
+  const numbers: number[] = [];
+  for (let i = 0; i < len; i++) {
+    let numStr = "";
+    for (let j = 0; j < numbersRaw.length; j++) {
+      numStr += numbersRaw[j][i];
     }
-    return Number(converted);
-  });
+    numbers.push(Number(numStr.trim()));
+  }
+
+  return numbers;
 }

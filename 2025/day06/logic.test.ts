@@ -38,14 +38,14 @@ describe("Day 6", () => {
       expect(result).toBe(3263827);
     });
 
-    it.todo("should solve the actual input", () => {
+    it("should solve the actual input", () => {
       const rawInput = fs
         .readFileSync(path.resolve(import.meta.dirname, "input.txt"))
         .toString();
       const input = prepareInput(rawInput);
       const result = solvePartTwo(input);
 
-      expect(result).toBe(-1);
+      expect(result).toBe(10603075273949);
     });
   });
 });
