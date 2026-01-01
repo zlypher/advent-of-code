@@ -5,7 +5,7 @@ export type Input = {
 export const prepareInput = (rawInput: string): Input => {
   let line: string | undefined;
   let commands = [];
-  const lines = rawInput.split("\r\n");
+  const lines = rawInput.split(/\r\n|\r|\n/);
   while ((line = lines.shift())) {
     commands.push({ dir: line[0], amount: Number(line.slice(1)) });
   }
